@@ -179,7 +179,7 @@ Here, the first object (file-01.txt) was uploaded before enabling versioning, an
 }
    ```
 
-  d.Attempt to delete the DeleteMarkers
+  d. Attempt to delete the DeleteMarkers
   ```
   root@client-01:~# aws s3api delete-object --bucket test-bucket --key file-01.txt --version-id a5TQiMUWerkXi3l7v0fMBxxsi84JLr. --endpoint-url http://192.168.9.12:8001
   ```
@@ -276,6 +276,8 @@ g. Verify that the bbject has been restored
 root@client-01:~# s3cmd ls s3://test-bucket
 2024-09-14 08:15   2097152   s3://test-bucket/file2.txt
 ```
+
+- Referemce: https://repost.aws/knowledge-center/s3-undelete-configuration
     
   
 
