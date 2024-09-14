@@ -1,7 +1,7 @@
-## Ceph-S3-Bucket-Versioning
+## Enabling and Implementing S3 Bucket Versioning in Ceph
 
 ### Objectives:
-HOw to enable and implement versioning in s3 to avoid accedently objects deletion.
+Learn how to enable and implement versioning in S3 to avoid accidental deletion of objects.
 
 ### Prerequisites:
 - A running Ceph Cluster.
@@ -24,7 +24,7 @@ upload: 'file-01.txt' -> 's3://test-bucket/file-01.txt'  [1 of 1]
  1048576 of 1048576   100% in    0s    26.87 MB/s  done
 ```
 
-3. Ensure versioning is not enabled, By default Bucket versioning in not enabled in Ceph, version ID will be null in disabled state.
+3. Verify Versioning Status by executing below command. By default, bucket versioning is not enabled in Ceph. The version ID will be null in the disabled state.
 ```
 root@client-01:~# aws s3api list-object-versions   --bucket test-bucket --endpoint-url http://192.168.9.12:8001
 {
@@ -46,28 +46,28 @@ root@client-01:~# aws s3api list-object-versions   --bucket test-bucket --endpoi
     "RequestCharged": null
 }
 ```
-This command also not throw any output if versioning is not enabled.
+The following command will not produce any output if versioning is not enabled:
 ```
 root@client-01:~# aws s3api get-bucket-versioning --bucket my-test-bucket-02 --endpoint-url http://192.168.9.12:8001
 
 ```
 
-4. Enable versioning in bucket
+4. Enable versioning on the bucket
 ```
 root@client-01:~# aws s3api put-bucket-versioning --bucket test-bucket --versioning-configuration Status=Enabled --endpoint-url http://192.168.9.12:8001
 ```
 
-5. Will verfify versioning is now enabled.
+5. Verify that Versioning is Enabled
 ```
-root@client-01:~# aws s3api get-bucket-versioning --bucket test-bucket --endpoint-url http://192.168.99.132:8001
+root@client-01:~# aws s3api get-bucket-versioning --bucket test-bucket --endpoint-url http://192.168.9.12:8001
 {
     "Status": "Enabled",
     "MFADelete": "Disabled"
 }
 ```
-Also by using this command but we will see here version id is still null because we uploaded this objects before enabling vesioning
+Note that objects uploaded before enable versioning will have a null version ID.
 ```
-root@client-01:~# aws s3api list-object-versions   --bucket test-bucket --endpoint-url http://192.168.99.132:8001
+root@client-01:~# aws s3api list-object-versions   --bucket test-bucket --endpoint-url http://192.168.9.12:8001
 {
     "Versions": [
         {
@@ -88,14 +88,14 @@ root@client-01:~# aws s3api list-object-versions   --bucket test-bucket --endpoi
 }
 ```
 
-6. Now we will upload data to see versioning is working or not
+6. Upload new data to verify versioning
 ```
 root@client-01:~# s3cmd put file2.txt s3://test-bucket
 upload: 'file2.txt' -> 's3://test-bucket/file2.txt'  [1 of 1]
  2097152 of 2097152   100% in    0s    32.06 MB/s  done
 ```
 
-7. Will verify any objects that are being uploaded after versioning enable is getting assign version id or not.
+7. Verify version IDs for newly uploaded objects
 ```
 root@client-01:~# aws s3api list-object-versions   --bucket test-bucket --endpoint-url http://192.168.9.12:8001
 {
@@ -130,23 +130,23 @@ root@client-01:~# aws s3api list-object-versions   --bucket test-bucket --endpoi
     "RequestCharged": null
 }
 ```
-In above case first objects uploaded before enable , and 2nd objects that is uploaded after enable versioning.
+Here, the first object (file-01.txt) was uploaded before enabling versioning, and the second object (file2.txt) was uploaded after versioning was enabled.
 
-8. Now we will delete both objects one by one and see what actually happens. First we will delete the object which are having "null" version ID.
+8. Delete objects and verify behavior
 
   a. Delete `file-01.txt` file
   ```
   root@client-01:~# s3cmd rm s3://test-bucket/file-01.txt
   delete: 's3://test-bucket/file-01.txt'
   ```
-  b. Verify that the file has deleted. only file2.txt is there
+  b. Verify the delition
   ```
   root@client-01:~# s3cmd ls s3://test-bucket
   2024-09-14 08:15   2097152   s3://test-bucket/file2.txt
   ```
-  c. We can see Delete Marker has been created even for this objects, keep in mind this is the object that has been uploaded to the bucket before enabling versioning.
+  c. Observe the delete marker creation
   ```
-  root@client-01:~# aws s3api list-object-versions   --bucket test-bucket --endpoint-url http://192.168.99.132:8001 --prefix file-01.txt
+  root@client-01:~# aws s3api list-object-versions   --bucket test-bucket --endpoint-url http://192.168.9.12:8001 --prefix file-01.txt
 {
     "Versions": [
         {
@@ -179,32 +179,32 @@ In above case first objects uploaded before enable , and 2nd objects that is upl
 }
    ```
 
-  d.Now lets try to deleet the `Delete Marker` and see if we are able to store the original objects. 
+  d.Attempt to delete the DeleteMarkers
   ```
   root@client-01:~# aws s3api delete-object --bucket test-bucket --key file-01.txt --version-id a5TQiMUWerkXi3l7v0fMBxxsi84JLr. --endpoint-url http://192.168.9.12:8001
   ```
-  Even after executing the command, we could not able to delete the `Delete Marker` and the this is still present and eventually we could not able to restore the objects on which the versioning was not enabled.
+  Even after executing this command, the delete marker remains, and the object cannot be restored because it was uploaded before versioning was enabled.
 
 
-9. Lets try deleting objects on which the versioning is enabled.
+9. Now delete objects with versioning enabled
 
-a.First ensure that the object `file2.txt` is there in the bucket.
+a.Ensure Object file2.txt exists
 ```
 root@client-01:~# s3cmd ls s3://test-bucket
 2024-09-14 08:15   2097152   s3://test-bucket/file2.txt
 ```
  
-b. Delete the object from the bucket.
+b. Delete the object.
 ```
 root@client-01:~# s3cmd rm s3://test-bucket/file2.txt
 delete: 's3://test-bucket/file2.txt'
 ```    
-c. Ensure that the file is no more.
+c. Ensure the file is no longer present
 ```
 root@client-01:~# s3cmd ls s3://test-bucket
 ```
 
-d. We can see dlete marker has been created against that object.
+d. Observe the creation of a DeleteMarkers
 ```
 root@client-01:~# aws s3api list-object-versions   --bucket test-bucket --endpoint-url http://192.168.9.12:8001 --prefix file2.txt
     {
@@ -240,7 +240,7 @@ root@client-01:~# aws s3api list-object-versions   --bucket test-bucket --endpoi
 
 ```
 
-e. Now we will delete the Delete marker.
+e. Now we will delete the Deletemarkers.
 ```
     root@client-01:~# aws s3api delete-object --bucket test-bucket --key file2.txt --version-id .Jpb0cX6yB8oMYAfVH7cp9gjmXC-NNb --endpoint-url http://192.168.9.12:8001
 {
@@ -249,7 +249,7 @@ e. Now we will delete the Delete marker.
 }
     ```
 
-    f. Ensure the the Delete marker has been removed.
+    f. Verify that the DeleteMarker has been removed
     ```
     root@client-01:~# aws s3api list-object-versions   --bucket test-bucket --endpoint-url http://192.168.9.12:8001 --prefix file2.txt
 {
@@ -271,7 +271,7 @@ e. Now we will delete the Delete marker.
     "RequestCharged": null
 }
 ```
-g. We can now see that the objects has now been restored by following command.
+g. Verify that the bbject has been restored
 ```
 root@client-01:~# s3cmd ls s3://test-bucket
 2024-09-14 08:15   2097152   s3://test-bucket/file2.txt
