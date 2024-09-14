@@ -11,7 +11,7 @@ Learn how to enable and implement versioning in S3 to avoid accidental deletion 
 
 ### Procedure:
 
-1. Create a bucket
+1. Create a bucket.
 ```
 root@client-01:~# s3cmd mb s3://test-bucket
 Bucket 's3://test-bucket/' created
@@ -277,7 +277,7 @@ root@client-01:~# s3cmd ls s3://test-bucket
 2024-09-14 08:15   2097152   s3://test-bucket/file2.txt
 ```
 
-- Referemce: https://repost.aws/knowledge-center/s3-undelete-configuration
+- Reference: https://repost.aws/knowledge-center/s3-undelete-configuration
     
   
 
