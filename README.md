@@ -186,28 +186,27 @@ In above case first objects uploaded before enable , and 2nd objects that is upl
   Even after executing the command, we could not able to delete the `Delete Marker` and the this is still present and eventually we could not able to restore the objects on which the versioning was not enabled.
 
 
-  9. Lets try deleting objects on which the versioning is enabled.
+9. Lets try deleting objects on which the versioning is enabled.
 
-     a.First ensure that the object `file2.txt` is there in the bucket.
-     ```
-     root@client-01:~# s3cmd ls s3://test-bucket
-     2024-09-14 08:15   2097152   s3://test-bucket/file2.txt
-     ```
+a.First ensure that the object `file2.txt` is there in the bucket.
+```
+root@client-01:~# s3cmd ls s3://test-bucket
+2024-09-14 08:15   2097152   s3://test-bucket/file2.txt
+```
  
-     b. Delete the object from the bucket.
-     ```
-     root@client-01:~# s3cmd rm s3://test-bucket/file2.txt
-     delete: 's3://test-bucket/file2.txt'
-     ```
+b. Delete the object from the bucket.
+```
+root@client-01:~# s3cmd rm s3://test-bucket/file2.txt
+delete: 's3://test-bucket/file2.txt'
+```    
+c. Ensure that the file is no more.
+```
+root@client-01:~# s3cmd ls s3://test-bucket
+```
 
-     c. Ensure that the file is no more.
-    ```
-    root@client-01:~# s3cmd ls s3://test-bucket
-    ```
-
-    d. We can see dlete marker has been created against that object.
-    ```
-    root@client-01:~# aws s3api list-object-versions   --bucket test-bucket --endpoint-url http://192.168.9.12:8001 --prefix file2.txt
+d. We can see dlete marker has been created against that object.
+```
+root@client-01:~# aws s3api list-object-versions   --bucket test-bucket --endpoint-url http://192.168.9.12:8001 --prefix file2.txt
     {
     "Versions": [
         {
@@ -238,11 +237,11 @@ In above case first objects uploaded before enable , and 2nd objects that is upl
     ],
     "RequestCharged": null
 }    
-    
-    ```
 
-    e. Now we will delete the Delete marker.
-    ```
+```
+
+e. Now we will delete the Delete marker.
+```
     root@client-01:~# aws s3api delete-object --bucket test-bucket --key file2.txt --version-id .Jpb0cX6yB8oMYAfVH7cp9gjmXC-NNb --endpoint-url http://192.168.9.12:8001
 {
     "DeleteMarker": true,
@@ -271,13 +270,12 @@ In above case first objects uploaded before enable , and 2nd objects that is upl
     ],
     "RequestCharged": null
 }
-    ```
-
-    g. We can now see that the objects has now been restored by following command.
-    ```
-    root@client-01:~# s3cmd ls s3://test-bucket
-    2024-09-14 08:15   2097152   s3://test-bucket/file2.txt
-    ```
+```
+g. We can now see that the objects has now been restored by following command.
+```
+root@client-01:~# s3cmd ls s3://test-bucket
+2024-09-14 08:15   2097152   s3://test-bucket/file2.txt
+```
     
   
 
