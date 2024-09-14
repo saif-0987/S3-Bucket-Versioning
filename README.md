@@ -158,16 +158,16 @@ In above case first objects uploaded before enable , and 2nd objects that is upl
             "IsLatest": false,
             "LastModified": "2024-09-14T08:08:36.319000+00:00",
             "Owner": {
-                "DisplayName": "duplicate-data-finder",
-                "ID": "duplicate-data-finder"
+                "DisplayName": "test-01",
+                "ID": "test-01"
             }
         }
     ],
     "DeleteMarkers": [
         {
             "Owner": {
-                "DisplayName": "duplicate-data-finder",
-                "ID": "duplicate-data-finder"
+                "DisplayName": "test-01",
+                "ID": "test-01"
             },
             "Key": "file-01.txt",
             "VersionId": "a5TQiMUWerkXi3l7v0fMBxxsi84JLr.",
@@ -186,21 +186,21 @@ In above case first objects uploaded before enable , and 2nd objects that is upl
   Even after executing the command, we could not able to delete the `Delete Marker` and the this is still present and eventually we could not able to restore the objects on which the versioning was not enabled.
 
 
-9. Lats try deleting objects on which the versioning is enabled.
+  9. Lets try deleting objects on which the versioning is enabled.
 
-    a. irst ensure that the object `file2.txt` is there in the bucket.
-    ```
-    root@client-01:~# s3cmd ls s3://test-bucket
-    2024-09-14 08:15   2097152   s3://test-bucket/file2.txt
-    ```
+     a.First ensure that the object `file2.txt` is there in the bucket.
+     ```
+     root@client-01:~# s3cmd ls s3://test-bucket
+     2024-09-14 08:15   2097152   s3://test-bucket/file2.txt
+     ```
+ 
+     b. Delete the object from the bucket.
+     ```
+     root@client-01:~# s3cmd rm s3://test-bucket/file2.txt
+     delete: 's3://test-bucket/file2.txt'
+     ```
 
-    b. Delete the object from the bucket.
-    ```
-    root@client-01:~# s3cmd rm s3://test-bucket/file2.txt
-    delete: 's3://test-bucket/file2.txt'
-    ```
-
-    c. Ensure that the file is no more.
+     c. Ensure that the file is no more.
     ```
     root@client-01:~# s3cmd ls s3://test-bucket
     ```
@@ -208,7 +208,7 @@ In above case first objects uploaded before enable , and 2nd objects that is upl
     d. We can see dlete marker has been created against that object.
     ```
     root@client-01:~# aws s3api list-object-versions   --bucket test-bucket --endpoint-url http://192.168.9.12:8001 --prefix file2.txt
-{
+    {
     "Versions": [
         {
             "ETag": "\"b2d1236c286a3c0704224fe4105eca49\"",
@@ -219,16 +219,16 @@ In above case first objects uploaded before enable , and 2nd objects that is upl
             "IsLatest": false,
             "LastModified": "2024-09-14T08:15:38.403000+00:00",
             "Owner": {
-                "DisplayName": "duplicate-data-finder",
-                "ID": "duplicate-data-finder"
+                "DisplayName": "test-01",
+                "ID": "test-01"
             }
         }
     ],
     "DeleteMarkers": [
         {
             "Owner": {
-                "DisplayName": "duplicate-data-finder",
-                "ID": "duplicate-data-finder"
+                "DisplayName": "test-01",
+                "ID": "test-01"
             },
             "Key": "file2.txt",
             "VersionId": ".Jpb0cX6yB8oMYAfVH7cp9gjmXC-NNb",
@@ -252,10 +252,10 @@ In above case first objects uploaded before enable , and 2nd objects that is upl
 
     f. Ensure the the Delete marker has been removed.
     ```
-    root@client-01:~# aws s3api list-object-versions   --bucket test-bucket --endpoint-url http://192.168.99.132:8001 --prefix file2.txt
+    root@client-01:~# aws s3api list-object-versions   --bucket test-bucket --endpoint-url http://192.168.9.12:8001 --prefix file2.txt
 {
-    "Versions": [
-        {
+    "Versions": 
+    {
             "ETag": "\"b2d1236c286a3c0704224fe4105eca49\"",
             "Size": 2097152,
             "StorageClass": "STANDARD",
@@ -264,8 +264,8 @@ In above case first objects uploaded before enable , and 2nd objects that is upl
             "IsLatest": true,
             "LastModified": "2024-09-14T08:15:38.403000+00:00",
             "Owner": {
-                "DisplayName": "duplicate-data-finder",
-                "ID": "duplicate-data-finder"
+                "DisplayName": "test-01",
+                "ID": "test-01"
             }
         }
     ],
