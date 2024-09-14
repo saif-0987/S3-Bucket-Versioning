@@ -271,7 +271,7 @@ e. Now we will delete the Deletemarkers.
     "RequestCharged": null
 }
 ```
-g. Verify that the bbject has been restored
+g. Verify that the object has been restored
 ```
 root@client-01:~# s3cmd ls s3://test-bucket
 2024-09-14 08:15   2097152   s3://test-bucket/file2.txt
